@@ -1,0 +1,18 @@
+lined - simple line-based text editor
+-------------------------------------
+
+
+Command format [start[,end][CMD][String Argument]
+
+Commands:
+  n         - No CMD, move to line n
+  n,m       - No CMD, list lines n-m
+  L         - List specified line, range, or if not specified the current line
+  P         - List specified line(s) or current line, set current line to last printed
+  I         - Enter insert mode, inserting lines before the current line
+  A         - Enter insert mode, inserting lines after the current line
+  W         - Write out buffer to file
+  Q         - Quit
+
+To exit insert mode enter a line containing only a single '.' and press return
+

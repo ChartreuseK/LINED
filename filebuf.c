@@ -30,7 +30,7 @@ int filebuf_init(struct filebuf *fb)
  *   Allocates a copy of the line to store in the buffer
  *   Returns
  */
-int filebuf_insert(struct filebuf *fb, const char *line, long pos)
+long filebuf_insert(struct filebuf *fb, const char *line, long pos)
 {
 	char *newline;
 	char **tmp;
@@ -44,6 +44,7 @@ int filebuf_insert(struct filebuf *fb, const char *line, long pos)
 		tmp = realloc(fb->lines, (fb->linessiz + BUFALLOCSIZ) * sizeof(char *));
 		if (tmp == NULL)
 			return -2;
+		fb->lines = tmp;
 			
 		fb->linessiz += BUFALLOCSIZ;
 	}
@@ -71,7 +72,7 @@ int filebuf_insert(struct filebuf *fb, const char *line, long pos)
  *    Frees allocated copy of line
  *    Returns number of remaining lines on success, negative on error
  */
-int filebuf_delete(struct filebuf *fb, long pos)
+long filebuf_delete(struct filebuf *fb, long pos)
 {
 	if (fb == NULL || fb->lines == NULL)
 		return -1;
@@ -91,7 +92,7 @@ int filebuf_delete(struct filebuf *fb, long pos)
 
 /* filebuf_load -- Reads in a file into a buffer
  */
-int filebuf_load(struct filebuf *fb, const char *filename)
+long filebuf_load(struct filebuf *fb, const char *filename)
 {
 	char buffer[8192];
 	FILE *file;
@@ -119,13 +120,13 @@ int filebuf_load(struct filebuf *fb, const char *filename)
 	}
 	
 	fclose(file);
-	return 0;
+	return fb->numlines;
 }
 
 
 /* filebuf_save -- Writes buffer out into file
  */
-int filebuf_save(struct filebuf *fb, const char *filename)
+long filebuf_save(struct filebuf *fb, const char *filename)
 {
 	FILE *file;
 	

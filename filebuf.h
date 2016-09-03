@@ -12,12 +12,12 @@ struct filebuf
 };
 
 
-int filebuf_init(struct filebuf *fb);
-int filebuf_insert(struct filebuf *fb, const char *line, long pos);
-int filebuf_delete(struct filebuf *fb, long pos);
-int filebuf_load(struct filebuf *fb, const char *filename);
-int filebuf_save(struct filebuf *fb, const char *filename);
-int filebuf_free(struct filebuf *fb);
+int  filebuf_init(struct filebuf *fb);
+long filebuf_insert(struct filebuf *fb, const char *line, long pos);
+long filebuf_delete(struct filebuf *fb, long pos);
+long filebuf_load(struct filebuf *fb, const char *filename);
+long filebuf_save(struct filebuf *fb, const char *filename);
+int  filebuf_free(struct filebuf *fb);
 
 
 #endif

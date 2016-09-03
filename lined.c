@@ -37,11 +37,12 @@ void docmd(void);
 char *fixesc(char *start);
 void fixlines(void);
 void insertmode(int append);
-
+void listlines(void);
+void listline(long pos);
 
 int main(int argc, char **argv)
 {
-	
+	long l;
 	if (argc < 2)
 	{
 		usage(argv[0], "Too few arguments\n");
@@ -52,11 +53,13 @@ int main(int argc, char **argv)
 	
 	filename = argv[1];
 	
-	if ( filebuf_load(&fb, filename) < 0)
+	if ( (l = filebuf_load(&fb, filename)) < 0)
 	{
 		printf("Creating new file '%s'\n",filename);
 		curline = 1;
 	}
+	else
+		printf("Read %d lines\n",l);
 	
 	while (running)
 	{
@@ -213,6 +216,8 @@ void parse(void)
 				break;
 			case '\0':
 			case '\n':
+			case ' ':
+			case '\t':
 				cmd = '\0';
 			default:
 				state = END;
@@ -299,9 +304,14 @@ void docmd(void)
 	
 	switch(cmd)
 	{
-	case '\0': // Change curline
-		curline = startl ? startl : 1;
-		
+	case '\0': // Change curline (or list if range given)
+		if (eltype != NONE)
+			listlines();
+		else
+		{
+			curline = (startl <= 0) ? 1 : startl;
+			listline(curline);
+		}
 		break;
 	case 'S': // Search
 		break;
@@ -328,28 +338,11 @@ void docmd(void)
 		}
 		break;
 	case 'L': // List line(s)
-		if (startl <= 0 || fb.numlines == 0)
-			break;
-			
-		if (endl <= startl && startl <= fb.numlines)
-			printf(" %c%*d: %s\n", (startl == curline)?'*':' ', numlength(startl), startl, fb.lines[startl-1]);
-		else
-		{ 
-			for (int i = startl; i <= endl && i <= fb.numlines; i++)
-				printf(" %c%*d: %s\n", (i == curline)?'*':' ', numlength(i), i, fb.lines[i-1]);
-		}
+		listlines();
 				
 		break;
 	case 'P': // List line(s) moving curline to last line listed 
-		if (startl <= 0 || fb.numlines == 0)
-			break;
-		if (endl <= startl && startl <= fb.numlines)
-			printf(" %c%*d: %s\n", (startl == curline)?'*':' ', numlength(startl), startl, fb.lines[startl-1]);
-		else
-		{ 
-			for (int i = startl; i <= endl && i <= fb.numlines; i++)
-				printf(" %c%*d: %s\n", (i == curline)?'*':' ', numlength(i), i, fb.lines[i-1]);
-		}
+		listlines();
 		curline = (endl > fb.numlines) ? fb.numlines : endl;
 		
 		break;
@@ -450,4 +443,26 @@ void insertmode(int append)
 		filebuf_insert(&fb, linebuf, curline-1);
 		curline++;
 	}		
+}
+
+
+void listlines(void)
+{
+
+	if (startl <= 0 || fb.numlines == 0)
+		return;
+		
+	if (endl <= startl && startl <= fb.numlines)
+		listline(startl);
+	else
+	{ 
+		for (int i = startl; i <= endl && i <= fb.numlines; i++)
+			listline(i);
+	}
+}
+
+
+void listline(long pos)
+{
+	printf(" %c%*d: %s\n", (pos == curline)?'*':' ', numlength(pos), pos, fb.lines[pos-1]);
 }

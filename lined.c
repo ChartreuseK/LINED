@@ -20,7 +20,6 @@ long endl    = 0;
 char cmd     = 0;
 char *srch   = NULL;
 char *repl   = NULL;
-
 char *filename = NULL;
 
 struct filebuf fb;
@@ -445,7 +444,8 @@ void insertmode(int append)
 	}		
 }
 
-
+/* listlines -- List lines from startl to endl
+ */
 void listlines(void)
 {
 
@@ -461,8 +461,13 @@ void listlines(void)
 	}
 }
 
-
+/* listline -- List one line of the file
+ */
 void listline(long pos)
 {
-	printf(" %c%*d: %s\n", (pos == curline)?'*':' ', numlength(pos), pos, fb.lines[pos-1]);
+	int width = numlength(pos);
+	
+	width = width < 4 ? 4 : width;
+	
+	printf(" %c%*d: %s\n", (pos == curline)?'*':' ', width , pos, fb.lines[pos-1]);
 }
